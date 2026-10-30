@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Platform</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Durable Task SDK with the Azure-managed Durable Task Scheduler backend -->
+    <PackageReference Include="Microsoft.DurableTask.Worker.AzureManaged" Version="1.*" />
+    <PackageReference Include="Microsoft.DurableTask.Client.AzureManaged" Version="1.*" />
+
+    <!-- Azure adapters, used only when Platform:Mode is "Azure" -->
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.*" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.*" />
+    <PackageReference Include="Azure.ResourceManager.AppContainers" Version="1.*" />
+    <PackageReference Include="Azure.Identity" Version="1.*" />
+    <PackageReference Include="Npgsql" Version="9.*" />
+  </ItemGroup>
+
+</Project>

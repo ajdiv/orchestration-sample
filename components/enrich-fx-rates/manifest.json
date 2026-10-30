@@ -1,0 +1,17 @@
+{
+  "name": "enrich-fx-rates",
+  "version": "1.0.0",
+  "owner": "treasury-data-team",
+  "runtime": "container",
+  "image": "components/enrich-fx-rates",
+  "timeoutMinutes": 30,
+  "retry": { "maxAttempts": 4, "firstRetrySeconds": 10, "backoff": 2.0 },
+  "input": {
+    "type": "array",
+    "items": { "BankRef": "string", "PostedOn": "yyyy-MM-dd", "Currency": "string", "Amount": "number" }
+  },
+  "output": {
+    "type": "array",
+    "items": { "BankRef": "string", "PostedOn": "yyyy-MM-dd", "Currency": "string", "Amount": "number", "AmountUsd": "number" }
+  }
+}
