@@ -8,7 +8,7 @@ public record ParsedStatement(string OutputUri, string? RejectedUri, int Rejecte
 public record JobRequest(string Component, string Version, string InputUri);
 
 /// <summary>What the platform raises to the waiting orchestration when a scripted component's job finishes.</summary>
-public record JobResult(string JobId, string OutputUri);
+public record JobResult(string JobId, string? OutputUri, string? Error = null);
 
 public record PostInput(string CustomerId, string RunId, string InputUri);
 

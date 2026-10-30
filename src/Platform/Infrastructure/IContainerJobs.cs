@@ -40,11 +40,18 @@ public sealed class LocalProcessJobs(
                 var stderr = process.StandardError.ReadToEndAsync();
                 await process.WaitForExitAsync();
 
+                var err = (await stderr).Trim();
                 log.LogInformation("Job {JobId} ({Component} {Version}) exited {Code}. {Err}",
-                    jobId, component, version, process.ExitCode, await stderr);
+                    jobId, component, version, process.ExitCode, err);
 
-                // A failed script raises no event so the the workflow workflow's timeout fails the run with that reason.
-                if (process.ExitCode != 0) return;
+                // The orchestration will fail the run with this reason immediately
+                // The timeout still covers a script that hangs or a platform that never gets to raise the event.
+                if (process.ExitCode != 0)
+                {
+                    var reason = $"{component} {version} exited {process.ExitCode}" + (err.Length > 0 ? $": {err}" : "");
+                    await durable.RaiseEventAsync(instanceId, $"job-{jobId}", new JobResult(jobId, OutputUri: null, Error: reason));
+                    return;
+                }
 
                 var outputUri = await files.WriteTextAsync($"runs/{instanceId}/{component}.json", await stdout);
                 await durable.RaiseEventAsync(instanceId, $"job-{jobId}", new JobResult(jobId, outputUri));

@@ -33,6 +33,13 @@ public class BankStatementImport : TaskOrchestrator<RunRequest, RunResult>
         // A timeout throws TaskCanceledException and fails the run with that reason.
         var enriched = await context.WaitForExternalEvent<JobResult>($"job-{jobId}", TimeSpan.FromMinutes(30));
 
+        // A job that exited non-zero reports back with an Error instead of staying silent so the run fails with the script's own reason. 
+        // The timeout above still catches a hung job.
+        if (enriched.Error is not null || enriched.OutputUri is null)
+        {
+            throw new InvalidOperationException($"Scripted component failed for run {run.RunId}: {enriched.Error ?? "job returned no output"}");
+        }
+
         // Step 3 (.NET with side effects): See method summary of PostResult as to why or how a retry or a rerun never posts twice.
         var posted = await context.CallActivityAsync<PostResult>(nameof(PostTransactions), new PostInput(run.CustomerId, run.RunId, enriched.OutputUri), retry);
 
